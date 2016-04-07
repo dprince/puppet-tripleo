@@ -35,12 +35,15 @@ class tripleo::profile::base::neutron::server (
   $manage_service   = undef,
   $enabled          = undef
 ) {
-  include ::neutron::config
-  include ::neutron::server::notifications
 
-  class { '::neutron::server':
-    sync_db        => $sync_db,
-    manage_service => $manage_service,
-    enabled        => $enabled
+  if $step >= 4 {
+    include ::neutron::config
+    include ::neutron::server::notifications
+
+    class { '::neutron::server':
+      sync_db        => $sync_db,
+      manage_service => $manage_service,
+      enabled        => $enabled
+    }
   }
 }

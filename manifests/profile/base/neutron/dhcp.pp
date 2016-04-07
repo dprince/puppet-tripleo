@@ -40,22 +40,27 @@ class tripleo::profile::base::neutron::dhcp (
   $enabled                 = undef,
   $manage_service          = undef,
 ) {
-  class { '::neutron::agents::dhcp':
-    manage_service => $manage_service,
-    enabled        => $enabled
-  }
+  if $step >= 4 {
 
-  file { '/etc/neutron/dnsmasq-neutron.conf':
-    content => $neutron_dnsmasq_options,
-    owner   => 'neutron',
-    group   => 'neutron',
-    notify  => Service['neutron-dhcp-service'],
-    require => Package['neutron'],
-  }
+    include ::neutron::config
+ 
+    class { '::neutron::agents::dhcp':
+      manage_service => $manage_service,
+      enabled        => $enabled
+    }
 
-  neutron_dhcp_agent_config {
-    'DEFAULT/ovs_use_veth': value => $neutron_ovs_use_veth;
-  }
+    file { '/etc/neutron/dnsmasq-neutron.conf':
+      content => $neutron_dnsmasq_options,
+      owner   => 'neutron',
+      group   => 'neutron',
+      notify  => Service['neutron-dhcp-service'],
+      require => Package['neutron'],
+    }
 
-  Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-dhcp' |>
+    neutron_dhcp_agent_config {
+      'DEFAULT/ovs_use_veth': value => $neutron_ovs_use_veth;
+    }
+
+    Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-dhcp' |>
+  }
 }

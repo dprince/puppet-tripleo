@@ -30,11 +30,15 @@ class tripleo::profile::base::neutron::ovs(
   $manage_service = undef,
   $enabled        = undef
 ) {
-  class { '::neutron::agents::ml2::ovs':
-    manage_service => $manage_service,
-    enabled        => $enabled
+  include ::neutron::config
+  if $step >= 4 {
+    class { '::neutron::agents::ml2::ovs':
+      manage_service => $manage_service,
+      enabled        => $enabled
+    }
+
+    # Optional since manage_service may be false and neutron server may not be colocated.
+    Service<| title == 'neutron-server' |> -> Service<| title == 'neutron-ovs-agent-service' |>
   }
 
-  # Optional since manage_service may be false and neutron server may not be colocated.
-  Service<| title == 'neutron-server' |> -> Service<| title == 'neutron-ovs-agent-service' |>
 }

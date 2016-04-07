@@ -35,13 +35,16 @@ class tripleo::profile::base::neutron::l3 (
   $enabled              = undef,
   $manage_service       = undef,
 ) {
-  class { '::neutron::agents::l3':
-    manage_service => $manage_service,
-    enabled        => $enabled
-  }
+  if $step >= 4 {
+    include ::neutron::config
+    class { '::neutron::agents::l3':
+      manage_service => $manage_service,
+      enabled        => $enabled
+    }
 
-  neutron_dhcp_agent_config {
-    'DEFAULT/ovs_use_veth': value => $neutron_ovs_use_veth;
+    neutron_dhcp_agent_config {
+      'DEFAULT/ovs_use_veth': value => $neutron_ovs_use_veth;
+    }
+    Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-l3' |>
   }
-  Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-l3' |>
 }

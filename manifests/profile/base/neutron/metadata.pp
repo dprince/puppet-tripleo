@@ -30,10 +30,13 @@ class tripleo::profile::base::neutron::metadata (
   $enabled              = undef,
   $manage_service       = undef,
 ) {
-  class { '::neutron::agents::metadata':
-    manage_service => $manage_service,
-    enabled        => $enabled
-  }
+  if $step >= 4 {
+    include ::neutron::config
+    class { '::neutron::agents::metadata':
+      manage_service => $manage_service,
+      enabled        => $enabled
+    }
 
-  Service<| title == 'neutron-server' |> -> Service<| title == 'neutron-metadata' |>
+    Service<| title == 'neutron-server' |> -> Service<| title == 'neutron-metadata' |>
+  }
 }

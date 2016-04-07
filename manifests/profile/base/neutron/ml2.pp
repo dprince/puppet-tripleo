@@ -47,22 +47,6 @@ class tripleo::profile::base::neutron::ml2 (
 ) {
   include ::neutron::plugins::ml2
 
-  if $include_ovs {
-    include ::profile::base::neutron::ovs
-  }
-
-  if $include_l3 {
-    include ::tripleo::profile::base::neutron::l3
-  }
-
-  if $include_dhcp {
-    include ::tripleo::profile::base::neutron::dhcp
-  }
-
-  if $include_metadata {
-    include ::tripleo::profile::base::neutron::metadata
-  }
-
   if 'cisco_n1kv' in $mechanism_drivers {
     include ::tripleo::profile::base::neutron::n1k
   }
